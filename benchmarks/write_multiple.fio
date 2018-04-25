@@ -1,0 +1,8 @@
+[create-files]
+ioengine=sync
+rw=write
+direct=1
+sync=1
+size=3200K
+nrfiles=100
+fallocate=none

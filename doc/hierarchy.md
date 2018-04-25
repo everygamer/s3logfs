@@ -1,0 +1,49 @@
+# Module and Class Hierarchy
+
+- module s3logfs
+  - mount(bucket_name, mount_path)
+  - class FuseS3LogFS (interface for FUSE)
+    - open()
+    - read()
+    - write()
+    - etc.
+  - class S3Bucket
+    - init(bucket_name)
+    - get_object(key) -> bytes
+    - get_object(key, offset, numBytes) -> bytes
+    - put_object(key, bytes)
+  - module fs
+    - current_checkpoint
+    - s3_bucket
+    - inode_for_path(path) -> INode
+    - class Checkpoint
+      - from_bytes(bytes) -> Checkpoint
+      - to_bytes() -> bytes
+      - imap() -> IMap
+      - last_segment_number
+      - timestamp
+    - class IMap
+      - from_bytes(bytes) -> Imap
+      - to_bytes() -> bytes
+      - inode(inum) -> Inode
+    - class INode
+      - from_bytes(bytes) -> INode
+      - to_bytes() -> bytes
+      - write(bytes, file_offset, length)
+        - Write data to log, update blocks, write inode, update imap.
+      - size
+      - permissions
+      - timestamps
+      - type (file/directory)
+      - blocks (how should we store this?)
+    - class Log
+      - read(segment_number, start_block_number, number of blocks) -> bytes
+      - write(bytes) -> (segment_number, block_number)
+        - when the current segment is full, send it to S3 and start a new one.
+      - current_segment (for writing)
+    - class Segment
+      - init(bytes)
+      - to_bytes() -> bytes
+      - read(block_number, number of blocks) -> bytes
+      - write(bytes) -> offset (always appends)
+      - free_space() -> int
